@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:blogger/constants/app_colors.dart';
 import 'package:blogger/views/home_view.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -51,14 +52,24 @@ class _LoginViewState extends State<LoginView> {
         idToken: googleAuth?.idToken,
       );
 
-      await FirebaseAuth.instance.signInWithCredential(credential);
-
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (_) => const HomeView(),
-        ),
+      UserCredential u = await FirebaseAuth.instance.signInWithCredential(
+        credential,
       );
+
+      if (u.user?.email != null) {
+        final store = FirebaseFirestore.instance;
+        await store.collection('users').doc(u.user?.email ?? '').set({
+          'email': u.user?.email ?? '',
+          'name': u.user?.displayName ?? '',
+          'image': u.user?.photoURL ?? '',
+        });
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (_) => const HomeView(),
+          ),
+        );
+      }
     } catch (error, stacktrace) {
       log(
         'Google Sign Error',
