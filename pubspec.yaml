@@ -41,6 +41,8 @@ dependencies:
 
   google_sign_in: ^5.2.1
 
+  pretty_json:
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

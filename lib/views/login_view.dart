@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:blogger/constants/app_colors.dart';
+import 'package:blogger/models/user_model.dart';
 import 'package:blogger/views/home_view.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -58,11 +59,11 @@ class _LoginViewState extends State<LoginView> {
 
       if (u.user?.email != null) {
         final store = FirebaseFirestore.instance;
-        await store.collection('users').doc(u.user?.email ?? '').set({
-          'email': u.user?.email ?? '',
-          'name': u.user?.displayName ?? '',
-          'image': u.user?.photoURL ?? '',
-        });
+        await store.collection('users').doc(u.user?.email ?? '').set(UserModel(
+              name: u.user?.displayName ?? '',
+              email: u.user?.email ?? '',
+              image: u.user?.photoURL ?? '',
+            ).toJson());
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
