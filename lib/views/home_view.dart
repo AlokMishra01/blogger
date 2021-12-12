@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:blogger/models/blog_model.dart';
 import 'package:blogger/models/user_model.dart';
+import 'package:blogger/views/blog_form_modal.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -152,7 +153,7 @@ class _HomeViewState extends State<HomeView> {
                                   ),
                                   title: Text(u.name ?? ''),
                                   trailing: IconButton(
-                                    onPressed: () {
+                                    onPressed: () async {
                                       final store = FirebaseFirestore.instance;
                                       store
                                           .collection('blogs')
@@ -183,45 +184,10 @@ class _HomeViewState extends State<HomeView> {
     );
   }
 
-  final _title = TextEditingController();
-  final _description = TextEditingController();
   _showModal() {
     showModalBottomSheet(
       context: context,
-      builder: (_) {
-        return Column(
-          children: [
-            TextField(
-              controller: _title,
-              decoration: InputDecoration(labelText: 'Title'),
-            ),
-            TextField(
-              controller: _description,
-              minLines: 5,
-              maxLines: 8,
-              decoration: InputDecoration(labelText: 'Description'),
-            ),
-            MaterialButton(
-              onPressed: () async {
-                final store = FirebaseFirestore.instance;
-                DocumentReference d = FirebaseFirestore.instance
-                    .collection('users')
-                    .doc(FirebaseAuth.instance.currentUser?.email);
-
-                await store.collection('blogs').add({
-                  'title': _title.text,
-                  'description': _description.text,
-                  'createdBy': d,
-                  'image': 'https://miro.medium.com/max/2000/0*_hVZ_qoWPxzQK3ws'
-                });
-                Navigator.pop(context);
-              },
-              color: Colors.green,
-              child: Text('Post'),
-            ),
-          ],
-        );
-      },
+      builder: (_) => const BlogFormModal(),
     );
   }
 }
